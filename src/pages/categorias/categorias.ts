@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { CategoriaService } from '../../services/domain/categoria.services';
+import { CategoriaService } from '../../services/domain/categoria.service';
 import { CategoriaDTO } from "../../models/categoria.dto";
 import { API_CONFIG } from "../../config/api.config";
 
@@ -37,8 +37,8 @@ export class CategoriasPage {
   	error => {	});
   
   }
-  showProdutos(){
-    this.navCtrl.push('ProdutosPage');
+  showProdutos(categoria_id : string){
+    this.navCtrl.push('ProdutosPage', {categoria_id: categoria_id});
   }
 
 }

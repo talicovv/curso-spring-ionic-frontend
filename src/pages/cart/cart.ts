@@ -1,7 +1,7 @@
 import { ProdutoService } from './../../services/domain/produto.service';
 import { CartService } from '../../services/domain/cart.service';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { CartItem } from '../../models/cart-Item';
 import { API_CONFIG } from '../../config/api.config';
 import { ProdutoDTO } from '../../models/produto.dto';
@@ -18,7 +18,8 @@ export class CartPage {
     public navCtrl: NavController, 
     public navParams: NavParams,
     public cartService: CartService,
-    public produtoService: ProdutoService) {    
+    public produtoService: ProdutoService,
+    public alertCrtl : AlertController) {    
   }
 
   ionViewDidLoad() {
@@ -56,6 +57,10 @@ export class CartPage {
 
   goOn(){
     this.navCtrl.setRoot('CategoriasPage');
+  }
+
+  checkout(){
+    this.navCtrl.push('PickAddressPage');   
   }
 
 }

@@ -20,7 +20,7 @@ export class ProdutoDetailPage {
       public navCtrl: NavController, 
       public navParams: NavParams,
       public produtoService : ProdutoService,
-      public cartService : CartService  ) {
+      public cartService : CartService ) {
   }
 
   ionViewDidLoad() {

@@ -1,7 +1,7 @@
 import { ClienteService } from './../../services/domain/cliente.service';
 import { CartService } from './../../services/domain/cart.service';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { PedidoDTO } from '../../models/pedido.dto';
 import { CartItem } from '../../models/cart-Item';
 import { ClienteDTO } from '../../models/cliente.dto';
@@ -21,14 +21,14 @@ export class OrderConfirmationPage {
   cartItems: CartItem[];
   cliente : ClienteDTO;
   endereco : EnderecoDTO;
+  codPedido : String;
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
     public cartService: CartService,
     public clienteService: ClienteService,
-    public pedidoService: PedidoService,
-    public alertCrtl : AlertController) {
+    public pedidoService: PedidoService) {
 
       this.pedido = this.navParams.get('pedido');
   }
@@ -55,33 +55,18 @@ export class OrderConfirmationPage {
   back(){
     this.navCtrl.setRoot('CartPage');
   }
-
-  showInsertOk(){
-    let alert = this.alertCrtl.create(
-      {
-        title: 'Sucesso!',
-        message: 'Pedido efetuado com sucesso!',
-        enableBackdropDismiss: false,
-        buttons:[{
-          text:'ok',
-          handler: () => {
-            this.navCtrl.setRoot('CategoriasPage');
-          }
-        }]
-
-      }
-    );
-    alert.present();
-    
+  home(){
+    this.navCtrl.setRoot('CategoriasPage');
   }
+
+  
 
   checkout(){
     
     this.pedidoService.insert(this.pedido)
       .subscribe(response => {
           this.cartService.createOrClearCart();
-          console.log(response.headers.get('location'));
-          this.showInsertOk();          
+          this.codPedido = this.extractId(response.headers.get('location'));                    
         },
         error =>{
           if (error.status == 403){
@@ -91,6 +76,12 @@ export class OrderConfirmationPage {
 
       );
   }
+
+  extractId(location: string): String {
+    let position = location.lastIndexOf("/");
+    return location.substring(position+1, location.length);
+  }
+
 
 
 }

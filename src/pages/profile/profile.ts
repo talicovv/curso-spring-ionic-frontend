@@ -6,7 +6,6 @@ import { ClienteService } from '../../services/domain/cliente.service';
 import { API_CONFIG } from '../../config/api.config';
 import { CameraOptions, Camera } from '@ionic-native/camera';
 
-
 @IonicPage()
 @Component({
   selector: 'page-profile',
@@ -14,50 +13,50 @@ import { CameraOptions, Camera } from '@ionic-native/camera';
 })
 export class ProfilePage {
 
-  cliente : ClienteDTO;
-  picture : String;
-  cameraOn : Boolean = false;
-  
+  cliente: ClienteDTO;
+  picture: string;
+  cameraOn: boolean = false;
 
   constructor(
-      public navCtrl: NavController, 
-      public navParams: NavParams,
-      public storage: StorageService,
-      public clienteService : ClienteService,
-      public camera: Camera  ) {
+    public navCtrl: NavController, 
+    public navParams: NavParams,
+    public storage: StorageService,
+    public clienteService: ClienteService,
+    public camera: Camera) {
   }
 
   ionViewDidLoad() {
-    this.loadData();  
+    this.loadData();
   }
 
-  loadData(){
+  loadData() {
     let localUser = this.storage.getLocalUser();
-    if (localUser && localUser.email){
+    if (localUser && localUser.email) {
       this.clienteService.findByEmail(localUser.email)
-      .subscribe(response => {
-        this.cliente = response as ClienteDTO;
-        this.getImageIfExists();
-      }, error => {
-        if(error.status == 403){
-          this.navCtrl.setRoot('HomePage');
-        }
-      });
+        .subscribe(response => {
+          this.cliente = response as ClienteDTO;
+          this.getImageIfExists();
+        },
+        error => {
+          if (error.status == 403) {
+            this.navCtrl.setRoot('HomePage');
+          }
+        });
     }
-    else{
+    else {
       this.navCtrl.setRoot('HomePage');
-    }
+    }    
   }
 
-  getImageIfExists(){
+  getImageIfExists() {
     this.clienteService.getImageFromBucket(this.cliente.id)
     .subscribe(response => {
-    this.cliente.imageUrl = `${API_CONFIG.bucketBaseUrl}/cp${this.cliente.id}.jpg`;
+      this.cliente.imageUrl = `${API_CONFIG.bucketBaseUrl}/cp${this.cliente.id}.jpg`;
     },
     error => {});
   }
 
-  getCameraPicture(){
+  getCameraPicture() {
 
     this.cameraOn = true;
 
@@ -69,23 +68,41 @@ export class ProfilePage {
     }
     
     this.camera.getPicture(options).then((imageData) => {
-     
      this.picture = 'data:image/png;base64,' + imageData;
+     this.cameraOn = false;
     }, (err) => {
-     
     });
-    this.cameraOn = false;
   }
 
-  sendPicture(){
+  getGalleryPicture() {
+    this.cameraOn = true;
+
+    const options: CameraOptions = {
+      quality: 100,
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.PNG,
+      mediaType: this.camera.MediaType.PICTURE
+    }
+    
+    this.camera.getPicture(options).then((imageData) => {
+     this.picture = 'data:image/png;base64,' + imageData;
+     this.cameraOn = false;
+    }, (err) => {
+    });
+  }
+
+  sendPicture() {
     this.clienteService.uploadPicture(this.picture)
-      .subscribe(response=>{
+      .subscribe(response => {
         this.picture = null;
         this.loadData();
-      }, error => {});
-  }
-  cancel(){
-    this.picture = null;
+      },
+      error => {
+      });
   }
 
+  cancel() {
+    this.picture = null;
+  }
 }
